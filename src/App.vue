@@ -292,7 +292,6 @@
 
     width: 80%;
     height: 80%;
-    /* border: 2px solid red; */
   }
 
 
