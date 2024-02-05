@@ -260,7 +260,7 @@
     transform: translate(-50%, -50%);
     z-index: 20;
     border: 2px solid black;
-    padding: 10px 50px;
+    padding: 10px 30px;
     background-color: white;
   }
   .main-content .center::before, .main-content .center::after{
@@ -349,7 +349,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 20em;
+    font-size: 15em;
     opacity: .3;
 
     z-index: 5;
