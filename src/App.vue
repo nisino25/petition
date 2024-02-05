@@ -30,6 +30,7 @@
 <script>
   import Matter from 'matter-js';
   import slackLogo from '@/assets/slack_logo_icon.png';
+  import db from '../firebase.js';
 
   export default {
     name: 'App',
@@ -50,6 +51,7 @@
         moveDistance: 50,
 
         nearDistance: 150,
+
       }
     },
     methods: {
@@ -107,6 +109,22 @@
       this.totalNumber++; // Assuming this.totalNumber is initialized somewhere
       this.circles.push(circle);
       this.checkAndRemoveCircles();
+
+      var docRef = db.collection('analytics').doc(`votes`);
+        
+      docRef.get().then((doc) => {
+          if (doc.exists) {
+
+              docRef.update({
+                totalNumber: this.totalNumber
+              })
+          } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+          }
+      }).catch((error) => {
+          console.log("Error getting document:", error);
+      });
     },
 
     checkAndRemoveCircles() {
@@ -130,36 +148,61 @@
     },
 
     handleMouseMove(e) {
-  const containerRect = this.$el.getBoundingClientRect();
-  const buttonRect = this.$refs.button.getBoundingClientRect();
+      const containerRect = this.$el.getBoundingClientRect();
+      const buttonRect = this.$refs.button.getBoundingClientRect();
 
-  // Calculate mouse position relative to the container
-  const mouseX = e.clientX - containerRect.left;
-  const mouseY = e.clientY - containerRect.top;
+      // Calculate mouse position relative to the container
+      const mouseX = e.clientX - containerRect.left;
+      const mouseY = e.clientY - containerRect.top;
 
-  // Calculate the center of the button
-  const buttonCenterX = buttonRect.left + buttonRect.width / 2 - containerRect.left;
-  const buttonCenterY = buttonRect.top + buttonRect.height / 2 - containerRect.top;
+      // Calculate the center of the button
+      const buttonCenterX = buttonRect.left + buttonRect.width / 2 - containerRect.left;
+      const buttonCenterY = buttonRect.top + buttonRect.height / 2 - containerRect.top;
 
-  // Calculate the distance between the mouse and the button center
-  const distanceX = buttonCenterX - mouseX;
-  const distanceY = buttonCenterY - mouseY;
-  const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+      // Calculate the distance between the mouse and the button center
+      const distanceX = buttonCenterX - mouseX;
+      const distanceY = buttonCenterY - mouseY;
+      const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
-  // Set a maximum distance the button can move
-  const maxMoveDistance = 20; // Adjust this value as needed
+      // Set a maximum distance the button can move
+      const maxMoveDistance = 20; // Adjust this value as needed
 
-  // Calculate the ratio of movement based on the distance and the maximum allowed distance
-  const moveRatio = Math.min(1, maxMoveDistance / distance);
+      // Calculate the ratio of movement based on the distance and the maximum allowed distance
+      const moveRatio = Math.min(1, maxMoveDistance / distance);
 
-  // Calculate the new position of the button
-  const newTop = this.buttonTop - distanceY * moveRatio;
-  const newLeft = this.buttonLeft - distanceX * moveRatio;
+      // Calculate the new position of the button
+      const newTop = this.buttonTop - distanceY * moveRatio;
+      const newLeft = this.buttonLeft - distanceX * moveRatio;
 
-  // Ensure the button stays within the container's bounds
-  this.buttonTop = Math.max(0, Math.min(containerRect.height - buttonRect.height, newTop));
-  this.buttonLeft = Math.max(0, Math.min(containerRect.width - buttonRect.width, newLeft));
-},
+      // Ensure the button stays within the container's bounds
+      this.buttonTop = Math.max(0, Math.min(containerRect.height - buttonRect.height, newTop));
+      this.buttonLeft = Math.max(0, Math.min(containerRect.width - buttonRect.width, newLeft));
+    },
+
+    increment(){
+      console.log('hey');
+      var docRef = db.collection('analytics').doc(`votes`);
+        
+        docRef.get().then((doc) => {
+            if (doc.exists) {
+              this.totalNumber = doc.data().totalNumber
+              console.log(`votes: ${this.totalNumber}`)
+
+              // this.totalNumber++
+              // if(!this.totalVisitors) return
+              // if(this.totalVisitors > 0){
+              //   docRef.update({
+              //     total: this.totalVisitors
+              //   })
+              // }
+            } else {
+                // doc.data() will be undefined in this case
+                console.log("No such document!");
+            }
+        }).catch((error) => {
+            console.log("Error getting document:", error);
+        });
+    },
 
 
     
@@ -168,6 +211,8 @@
   mounted() {
     console.clear()
     this.setupPhysics();
+
+    this.increment()
   },
   }
 </script>
